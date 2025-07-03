@@ -5,6 +5,7 @@
 4. Введите команду: docker-compose up --build
 
 api: http://localhost:5000/Swagger/Index.html
+
 db: http://localhost:5438
 
 Чтобы проверить работоспособность БД в терминале: psql -h localhost -p 5438 -U surveyuser -d surveydb
@@ -12,11 +13,18 @@ db: http://localhost:5438
 Когда попросит пароль, введите: surveypass
 
 
-Если используете DBeaver или pgAdmin то:--
-host: localhost или 127.0.0.1--
-port: 5438--
-user: surveyuser--
-pass: surveypass--
-db-name: surveydb--
-name: surveydb--
+Если используете DBeaver или pgAdmin то:
+
+host: localhost или 127.0.0.1
+
+port: 5438
+
+user: surveyuser
+
+pass: surveypass
+
+db-name: surveydb
+
+name: surveydb
+
 
