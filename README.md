@@ -7,7 +7,7 @@
 api: http://localhost:5000/Swagger/Index.html
 db: http://localhost:5438
 
-Чтобы проверить работоспособность БД в терминале: psql -h localhost -p 5438 -U surveyuser -d surveydb
+Чтобы проверить работоспособность БД в терминале: psql -h localhost -p 5438 -U surveyuser -d surveydb \r\n
 Когда попросит пароль, введите: surveypass
 
 Если используете DBeaver или pgAdmin то:
