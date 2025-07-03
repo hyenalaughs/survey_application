@@ -1,0 +1,101 @@
+﻿-- Создание таблицы опросов
+CREATE TABLE Surveys (
+    Id UUID PRIMARY KEY,
+    Title TEXT NOT NULL,
+    Description TEXT,
+    CreatedAt TIMESTAMP DEFAULT now()
+);
+
+-- Вопросы анкеты
+CREATE TABLE Questions (
+    Id UUID PRIMARY KEY,
+    SurveyId UUID REFERENCES Surveys(Id) ON DELETE CASCADE,
+    Text TEXT NOT NULL,
+    OrderNumber INT NOT NULL,
+    CONSTRAINT uq_question_order UNIQUE(SurveyId, OrderNumber)
+);
+
+-- Варианты ответов
+CREATE TABLE Answers (
+    Id UUID PRIMARY KEY,
+    QuestionId UUID REFERENCES Questions(Id) ON DELETE CASCADE,
+    Text TEXT NOT NULL
+);
+
+-- Отдельное прохождение опроса
+CREATE TABLE Interviews (
+    Id UUID PRIMARY KEY,
+    SurveyId UUID REFERENCES Surveys(Id),
+    StartedAt TIMESTAMP DEFAULT now()
+);
+
+-- Ответы конкретного пользователя
+CREATE TABLE Results (
+    Id UUID PRIMARY KEY,
+    InterviewId UUID REFERENCES Interviews(Id) ON DELETE CASCADE,
+    QuestionId UUID REFERENCES Questions(Id),
+    AnswerId UUID REFERENCES Answers(Id),
+    AnsweredAt TIMESTAMP DEFAULT now(),
+    CONSTRAINT uq_answer_per_question UNIQUE(InterviewId, QuestionId)
+);
+
+-- Индексы
+CREATE INDEX idx_question_survey ON Questions(SurveyId);
+CREATE INDEX idx_answer_question ON Answers(QuestionId);
+CREATE INDEX idx_result_interview ON Results(InterviewId);
+
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+
+DO $$
+DECLARE
+    survey_id UUID := uuid_generate_v4();
+    interview_id UUID := uuid_generate_v4();
+
+    q1_id UUID := uuid_generate_v4();
+    q2_id UUID := uuid_generate_v4();
+
+    a1_1 UUID := uuid_generate_v4();
+    a1_2 UUID := uuid_generate_v4();
+    a1_3 UUID := uuid_generate_v4();
+
+    a2_1 UUID := uuid_generate_v4();
+    a2_2 UUID := uuid_generate_v4();
+
+    r1_id UUID := uuid_generate_v4();
+    r2_id UUID := uuid_generate_v4();
+BEGIN
+    -- Опрос
+    INSERT INTO Surveys (Id, Title, Description, CreatedAt)
+    VALUES (survey_id, 'Опрос об удовлетворенности', 'Насколько вы довольны нашей работой?', now());
+
+    -- Вопросы
+    INSERT INTO Questions (Id, SurveyId, Text, OrderNumber)
+    VALUES 
+        (q1_id, survey_id, 'Оцените качество обслуживания', 1),
+        (q2_id, survey_id, 'Порекомендуете ли вы нас друзьям?', 2);
+
+    -- Варианты ответов для первого вопроса
+    INSERT INTO Answers (Id, QuestionId, Text)
+    VALUES
+        (a1_1, q1_id, 'Отлично'),
+        (a1_2, q1_id, 'Хорошо'),
+        (a1_3, q1_id, 'Плохо');
+
+    -- Варианты ответов для второго вопроса
+    INSERT INTO Answers (Id, QuestionId, Text)
+    VALUES
+        (a2_1, q2_id, 'Да'),
+        (a2_2, q2_id, 'Нет');
+
+    -- Интервью (прохождение)
+    INSERT INTO Interviews (Id, SurveyId, StartedAt)
+    VALUES (interview_id, survey_id, now());
+
+    -- Результаты
+    INSERT INTO Results (Id, InterviewId, QuestionId, AnswerId, AnsweredAt)
+    VALUES
+        (r1_id, interview_id, q1_id, a1_2, now()),  -- "Хорошо"
+        (r2_id, interview_id, q2_id, a2_2, now());  -- "Нет"
+END $$;

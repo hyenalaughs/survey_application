@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:15
+    container_name: survey-postgres
+    environment:
+      POSTGRES_USER: surveyuser
+      POSTGRES_PASSWORD: surveypass
+      POSTGRES_DB: surveydb
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+    ports:
+      - "5438:5432"
+    networks:
+      - backend
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+
+  api:
+    build:
+      context: ./TestTaskQuestions
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    container_name: survey-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=Host=db;Port=5432;Database=surveydb;Username=surveyuser;Password=surveypass
+    depends_on:
+      - db
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
