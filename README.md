@@ -13,18 +13,12 @@ db: http://localhost:5438
 Когда попросит пароль, введите: surveypass
 
 
-Если используете DBeaver или pgAdmin то:
-
-host: localhost или 127.0.0.1
-
-port: 5438
-
-user: surveyuser
-
-pass: surveypass
-
-db-name: surveydb
-
+Если используете DBeaver или pgAdmin то: 
+host: localhost или 127.0.0.1 
+port: 5438 
+user: surveyuser 
+pass: surveypass 
+db-name: surveydb 
 name: surveydb
 
 
